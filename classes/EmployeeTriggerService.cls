@@ -37,25 +37,24 @@ public with sharing class EmployeeTriggerService {
     
     
     
-     //task_4 count dev's, qa's
+   //task_4 count dev's, qa's
     public static void OnAfterUpdateActiveDepartmentFieldsServ(List<Employee__c> employeesNew, List<Employee__c> employeesOld){
-      
+      	//check if isset projects
         List<AggregateResult> projects = [SELECT Project__c FROM EmployeeSkills__c  GROUP BY Project__c];
-      //System.debug(projects)  ;
         
          if(projects.size()>0){
+             //key - id project and info - count dev's and qa's
              Map<Id, Info> mapInfo = new Map<Id, Info>();
              
              for(Employee__c empl : employeesOld){
-                 //вытаскиваем проекты рабочего
+                 //pull out the projects of the employee
                  List<AggregateResult> lsProjectsOfEmpl = [
                      SELECT  Project__c FROM EmployeeSkills__c WHERE  Employee__c  =: empl.Id GROUP BY Project__c
-                 ];
-				//System.debug(lsProjectsOfEmpl)  ;	                 
+                 ];                 
                  
                  Integer Qa = 0;
                  Integer Dev = 0;
-                 //Boolean  flag;
+                 //consider changes
                  for(Integer i = 0, size = employeesNew.size(); i<size; i++){
                      if(employeesOld[i].isActive__c == False && employeesNew[i].isActive__c == True){
                          if(employeesNew[i].IT_Department__c == 'QA'){
@@ -63,15 +62,13 @@ public with sharing class EmployeeTriggerService {
                          }else if(employeesNew[i].IT_Department__c == 'DEV'){
                              Dev++; 
                          }
-                     }
-                     if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == False){
+                     }else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == False){
                           if(employeesOld[i].IT_Department__c == 'QA'){
                              Qa--; 
                          }else if(employeesOld[i].IT_Department__c == 'DEV'){
                              Dev--; 
                          }
-                     }
-                     if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == True){
+                     }else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == True){
                          
                          if(employeesNew[i].IT_Department__c ==  'QA' && employeesOld[i].IT_Department__c !=  'QA'){
                              Qa++; 
@@ -86,28 +83,27 @@ public with sharing class EmployeeTriggerService {
                              Dev--; 
                          }
                      }
-                 }
-                 //System.debug('QA='+Qa) ;	
-                 //System.debug('Dev='+Dev) ;	
+                 }	
                  
-                 
+                 //fill map changes
                  if(Qa != 0 || Dev !=0){
                      for(AggregateResult prt : lsProjectsOfEmpl){
                          Id idProject = (Id) prt.get('Project__c');
                          Info inf = mapInfo.get(idProject);
+                         //if record with project isset - update it else create record for this project
                          if(inf != null){
                              inf.changeQa += Qa;
                              inf.changeDev += Dev;
                          }else{
                              mapInfo.put(idProject, new Info(Qa,Dev));
                          }
-                     }
-                     
-                 }
-				//System.debug(mapInfo);                
+                     } 
+                 }               
              }
              
              List<Project__c> updProjectList = new 	List<Project__c>();
+             //go through projects that require changes, 
+             //read the original data and change them taking into account new data
              Set<Id> idList= mapInfo.keySet();
              for(Id i: idList){
                  Info infoProject = mapInfo.get(i);
@@ -117,9 +113,9 @@ public with sharing class EmployeeTriggerService {
                  updProjectList.add(p);
              }
              
+             //update all the affected projects
              update updProjectList;
          }  
-
     }
     
     public class Info{
