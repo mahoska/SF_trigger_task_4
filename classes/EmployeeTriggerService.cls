@@ -56,33 +56,35 @@ public with sharing class EmployeeTriggerService {
                  Integer Dev = 0;
                  //consider changes
                  for(Integer i = 0, size = employeesNew.size(); i<size; i++){
-                     if(employeesOld[i].isActive__c == False && employeesNew[i].isActive__c == True){
-                         if(employeesNew[i].IT_Department__c == 'QA'){
-                             Qa++; 
-                         }else if(employeesNew[i].IT_Department__c == 'DEV'){
-                             Dev++; 
-                         }
-                     }else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == False){
-                          if(employeesOld[i].IT_Department__c == 'QA'){
-                             Qa--; 
-                         }else if(employeesOld[i].IT_Department__c == 'DEV'){
-                             Dev--; 
-                         }
-                     }else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == True){
-                         
-                         if(employeesNew[i].IT_Department__c ==  'QA' && employeesOld[i].IT_Department__c !=  'QA'){
-                             Qa++; 
-                         }
-                         if(employeesNew[i].IT_Department__c ==  'DEV' && employeesOld[i].IT_Department__c !=  'DEV'){
-                             Dev++; 
-                         }
-                         if(employeesOld[i].IT_Department__c ==  'QA' && employeesNew[i].IT_Department__c !=  'QA' ){
-                             Qa--;
-                         }
-                         if(employeesOld[i].IT_Department__c ==  'DEV' && employeesNew[i].IT_Department__c !=  'DEV' ){
-                             Dev--; 
-                         }
-                     }
+					if(employeesOld[i].Id == empl.Id){
+						if(employeesOld[i].isActive__c == False && employeesNew[i].isActive__c == True){
+							if(employeesNew[i].IT_Department__c == 'QA'){
+								 Qa++; 
+							}else if(employeesNew[i].IT_Department__c == 'DEV'){
+								 Dev++; 
+							}
+						}else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == False){
+							if(employeesOld[i].IT_Department__c == 'QA'){
+								 Qa--; 
+							}else if(employeesOld[i].IT_Department__c == 'DEV'){
+								 Dev--; 
+							}
+						}else if(employeesOld[i].isActive__c == True && employeesNew[i].isActive__c == True){
+							 
+							if(employeesNew[i].IT_Department__c ==  'QA' && employeesOld[i].IT_Department__c !=  'QA'){
+								 Qa++; 
+							}
+							if(employeesNew[i].IT_Department__c ==  'DEV' && employeesOld[i].IT_Department__c !=  'DEV'){
+								 Dev++; 
+							}
+							if(employeesOld[i].IT_Department__c ==  'QA' && employeesNew[i].IT_Department__c !=  'QA' ){
+								 Qa--;
+							}
+							if(employeesOld[i].IT_Department__c ==  'DEV' && employeesNew[i].IT_Department__c !=  'DEV' ){
+								 Dev--; 
+							}
+						}
+					 }
                  }	
                  
                  //fill map changes
